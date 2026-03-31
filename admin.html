@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Muhammed Sabith Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+
+/* ======= TOKENS ======= */
+[data-theme="dark"] {
+  --bg:       #070C1A;
+  --sidebar:  #0B1220;
+  --card:     #0F1830;
+  --card-2:   #121E38;
+  --border:   rgba(255,255,255,0.07);
+  --border-h: rgba(255,255,255,0.14);
+  --text:     #EDE8DF;
+  --text-dim: #8A8680;
+  --text-xs:  #5A5650;
+  --gold:     #C9A84C;
+  --gold-lt:  #E8C870;
+  --gold-dim: rgba(201,168,76,0.12);
+  --accent:   #3A7BD5;
+  --success:  #27AE60;
+  --danger:   #C0392B;
+  --warn:     #D4AC0D;
+  --info:     #2980B9;
+  --shadow:   0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg:0 12px 48px rgba(0,0,0,0.55);
+}
+[data-theme="light"] {
+  --bg:       #F0EDE7;
+  --sidebar:  #FFFFFF;
+  --card:     #FFFFFF;
+  --card-2:   #F8F5F0;
+  --border:   rgba(0,0,0,0.08);
+  --border-h: rgba(0,0,0,0.15);
+  --text:     #18140C;
+  --text-dim: #6B6257;
+  --text-xs:  #A09888;
+  --gold:     #A0711F;
+  --gold-lt:  #C08B2A;
+  --gold-dim: rgba(160,113,31,0.1);
+  --accent:   #1A5CB8;
+  --success:  #1E7A40;
+  --danger:   #A02020;
+  --warn:     #A07800;
+  --info:     #1060A0;
+  --shadow:   0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background 0.35s,color 0.35s;}
+a{text-decoration:none;color:inherit;}
+button{font-family:'DM Sans',sans-serif;}
+
+/* ======= LOGIN PAGE ======= */
+#login-page {
+  min-height:100vh; display:flex;
+  align-items:center; justify-content:center;
+  background:var(--bg); position:relative; overflow:hidden;
+}
+.login-bg {
+  position:absolute; inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.login-glow {
+  position:absolute; width:500px; height:500px; border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);
+  top:50%; left:50%; transform:translate(-50%,-50%);
+}
+.login-card {
+  position:relative; z-index:10;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:8px; padding:3rem; width:100%; max-width:420px;
+  box-shadow:var(--shadow-lg);
+  animation:slideUp 0.5s ease;
+}
+.login-logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem; font-weight:300; color:var(--gold);
+  letter-spacing:0.1em; margin-bottom:0.3rem;
+}
+.login-sub {
+  font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:600;
+  letter-spacing:0.18em; text-transform:uppercase; color:var(--text-dim);
+  margin-bottom:2.5rem;
+}
+.login-divider { width:100%; height:1px; background:var(--border); margin-bottom:2rem; }
+.field-label {
+  font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:600;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
+  display:block; margin-bottom:0.4rem;
+}
+.field-input {
+  width:100%; background:var(--card-2); border:1px solid var(--border-h);
+  border-radius:4px; padding:0.75rem 1rem;
+  font-family:'DM Sans',sans-serif; font-size:0.9rem; color:var(--text);
+  outline:none; transition:border-color 0.3s; margin-bottom:1.2rem;
+}
+.field-input:focus { border-color:var(--gold); }
+.login-err {
+  background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.3);
+  border-radius:3px; padding:0.6rem 1rem;
+  font-size:0.82rem; color:var(--danger);
+  margin-bottom:1rem; display:none;
+}
+.login-hint { font-size:0.75rem; color:var(--text-dim); text-align:center; margin-top:1.2rem; opacity:0.6; }
+
+/* ======= APP SHELL ======= */
+#app { display:none; height:100vh; flex-direction:column; }
+#app.active { display:flex; }
+
+/* TOP BAR */
+.topbar {
+  height:56px; background:var(--sidebar);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 1.5rem; flex-shrink:0; z-index:200;
+}
+.topbar-left { display:flex; align-items:center; gap:1rem; }
+.topbar-logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem; font-weight:600; color:var(--gold);
+}
+.topbar-badge {
+  font-family:'Syne',sans-serif; font-size:0.58rem; font-weight:700;
+  letter-spacing:0.14em; text-transform:uppercase;
+  background:var(--gold-dim); color:var(--gold);
+  border:1px solid rgba(201,168,76,0.25);
+  padding:0.15rem 0.5rem; border-radius:2px;
+}
+.topbar-right { display:flex; align-items:center; gap:0.8rem; }
+.topbar-btn {
+  background:var(--card-2); border:1px solid var(--border);
+  border-radius:4px; padding:0.35rem 0.75rem;
+  font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:600;
+  letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim);
+  cursor:pointer; transition:all 0.2s;
+}
+.topbar-btn:hover { border-color:var(--border-h); color:var(--text); }
+.topbar-btn.danger:hover { border-color:var(--danger); color:var(--danger); }
+.theme-pill {
+  display:flex; align-items:center; gap:2px;
+  background:var(--card-2); border:1px solid var(--border);
+  border-radius:20px; padding:3px;
+}
+.tp-btn {
+  width:26px; height:26px; border-radius:50%;
+  border:none; background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.8rem; cursor:pointer; transition:all 0.25s;
+}
+.tp-btn.active { background:var(--gold); }
+
+/* BODY */
+.app-body { display:flex; flex:1; overflow:hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width:220px; background:var(--sidebar);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  flex-shrink:0; overflow-y:auto;
+}
+.sidebar-section {
+  padding:1.2rem 1rem 0.6rem;
+  font-family:'Syne',sans-serif; font-size:0.6rem; font-weight:700;
+  letter-spacing:0.18em; text-transform:uppercase; color:var(--text-xs);
+}
+.nav-item {
+  display:flex; align-items:center; gap:0.7rem;
+  padding:0.65rem 1rem; margin:0.1rem 0.5rem;
+  border-radius:4px; cursor:pointer;
+  font-size:0.85rem; color:var(--text-dim);
+  transition:all 0.2s;
+}
+.nav-item:hover { background:var(--border); color:var(--text); }
+.nav-item.active { background:var(--gold-dim); color:var(--gold); border:1px solid rgba(201,168,76,0.2); }
+.nav-item .ni-icon { font-size:1rem; flex-shrink:0; }
+.nav-badge {
+  margin-left:auto; background:var(--gold); color:var(--bg);
+  font-family:'Syne',sans-serif; font-size:0.6rem; font-weight:700;
+  padding:0.1rem 0.45rem; border-radius:10px;
+}
+.sidebar-user {
+  margin-top:auto; padding:1rem;
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:0.7rem;
+}
+.user-avatar {
+  width:34px; height:34px; border-radius:50%;
+  background:var(--gold-dim); border:1px solid rgba(201,168,76,0.35);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-size:0.7rem; font-weight:700; color:var(--gold);
+  flex-shrink:0;
+}
+.user-name { font-size:0.82rem; font-weight:500; color:var(--text); }
+.user-role { font-size:0.72rem; color:var(--text-dim); }
+
+/* MAIN CONTENT */
+.main { flex:1; overflow-y:auto; padding:2rem; }
+.page { display:none; }
+.page.active { display:block; animation:fadeIn 0.3s ease; }
+
+.page-header { margin-bottom:2rem; }
+.page-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem; font-weight:300; color:var(--text); margin-bottom:0.3rem;
+}
+.page-sub { font-size:0.88rem; color:var(--text-dim); }
+
+/* STAT CARDS */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
+.stat-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:6px; padding:1.3rem 1.5rem;
+  position:relative; overflow:hidden;
+  transition:all 0.25s; box-shadow:var(--shadow);
+}
+.stat-card:hover { border-color:var(--border-h); transform:translateY(-1px); box-shadow:var(--shadow-lg); }
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(to right,var(--gold),transparent);
+}
+.sc-label {
+  font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:600;
+  letter-spacing:0.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:0.7rem;
+}
+.sc-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem; font-weight:600; color:var(--gold); line-height:1;
+}
+.sc-change {
+  font-size:0.74rem; color:var(--success); margin-top:0.4rem;
+}
+.sc-change.down { color:var(--danger); }
+.sc-icon {
+  position:absolute; top:1rem; right:1rem;
+  font-size:1.5rem; opacity:0.25;
+}
+
+/* TABLE */
+.table-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:6px; overflow:hidden; box-shadow:var(--shadow);
+  margin-bottom:1.5rem;
+}
+.table-header {
+  padding:1.2rem 1.5rem; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+}
+.table-title {
+  font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--text);
+}
+.table-actions { display:flex; gap:0.5rem; }
+table { width:100%; border-collapse:collapse; }
+thead th {
+  font-family:'Syne',sans-serif; font-size:0.62rem; font-weight:600;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
+  text-align:left; padding:0.8rem 1.2rem;
+  border-bottom:1px solid var(--border); white-space:nowrap;
+}
+tbody td {
+  padding:0.9rem 1.2rem; border-bottom:1px solid var(--border);
+  font-size:0.84rem; color:var(--text); vertical-align:middle;
+}
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover td { background:var(--card-2); }
+.empty-row td { text-align:center; color:var(--text-dim); font-style:italic; padding:2.5rem; }
+
+/* BADGES */
+.badge {
+  display:inline-flex; align-items:center; gap:0.3rem;
+  font-family:'Syne',sans-serif; font-size:0.6rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  padding:0.2rem 0.6rem; border-radius:3px;
+}
+.badge-success { background:rgba(39,174,96,0.12); color:var(--success); border:1px solid rgba(39,174,96,0.25); }
+.badge-draft   { background:rgba(212,172,13,0.12); color:var(--warn); border:1px solid rgba(212,172,13,0.25); }
+.badge-info    { background:rgba(41,128,185,0.12); color:var(--info); border:1px solid rgba(41,128,185,0.25); }
+.badge-danger  { background:rgba(192,57,43,0.12); color:var(--danger); border:1px solid rgba(192,57,43,0.25); }
+
+/* ACTION BUTTONS */
+.act { background:none; border:1px solid var(--border); border-radius:3px; padding:0.25rem 0.6rem; font-family:'Syne',sans-serif; font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; transition:all 0.2s; }
+.act:hover { border-color:var(--border-h); color:var(--text); }
+.act.edit:hover { border-color:var(--info); color:var(--info); }
+.act.del:hover { border-color:var(--danger); color:var(--danger); }
+.act.view:hover { border-color:var(--success); color:var(--success); }
+
+/* TOOLBAR */
+.toolbar { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
+.search-box {
+  background:var(--card-2); border:1px solid var(--border);
+  border-radius:4px; padding:0.45rem 0.8rem;
+  font-family:'DM Sans',sans-serif; font-size:0.82rem; color:var(--text);
+  outline:none; transition:border-color 0.2s; width:220px;
+}
+.search-box:focus { border-color:var(--gold); }
+.select-box {
+  background:var(--card-2); border:1px solid var(--border);
+  border-radius:4px; padding:0.45rem 0.7rem;
+  font-family:'Syne',sans-serif; font-size:0.7rem; font-weight:600;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim);
+  outline:none; cursor:pointer;
+}
+.select-box option { background:var(--card); color:var(--text); }
+
+/* BTN PRIMARY */
+.btn-p {
+  font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:600;
+  letter-spacing:0.12em; text-transform:uppercase;
+  background:var(--gold); color:#111; border:none;
+  padding:0.55rem 1.1rem; border-radius:3px; cursor:pointer;
+  transition:all 0.2s; display:inline-flex; align-items:center; gap:0.4rem;
+}
+.btn-p:hover { background:var(--gold-lt); transform:translateY(-1px); }
+.btn-s {
+  font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:600;
+  letter-spacing:0.12em; text-transform:uppercase;
+  background:transparent; color:var(--text-dim);
+  border:1px solid var(--border); padding:0.5rem 1rem;
+  border-radius:3px; cursor:pointer; transition:all 0.2s;
+}
+.btn-s:hover { border-color:var(--border-h); color:var(--text); }
+
+/* CARDS GRID */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.2rem; }
+.panel {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:6px; padding:1.5rem; box-shadow:var(--shadow);
+}
+.panel-title {
+  font-family:'Syne',sans-serif; font-size:0.75rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase; color:var(--gold);
+  margin-bottom:1.2rem; padding-bottom:0.8rem; border-bottom:1px solid var(--border);
+}
+
+/* FORM INSIDE MODAL */
+.f-group { margin-bottom:1rem; }
+.f-label { font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); display:block; margin-bottom:0.4rem; }
+.f-input {
+  width:100%; background:var(--card-2); border:1px solid var(--border-h);
+  border-radius:4px; padding:0.7rem 0.9rem;
+  font-family:'DM Sans',sans-serif; font-size:0.88rem; color:var(--text);
+  outline:none; transition:border-color 0.25s;
+}
+.f-input:focus { border-color:var(--gold); }
+.f-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+/* CHART BAR PLACEHOLDER */
+.chart-bars {
+  display:flex; align-items:flex-end; gap:6px; height:100px; margin-top:1rem;
+}
+.bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar-fill {
+  width:100%; border-radius:2px 2px 0 0;
+  background:linear-gradient(to top,var(--gold-dim),rgba(201,168,76,0.35));
+  border:1px solid rgba(201,168,76,0.25);
+  transition:height 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.bar-label { font-family:'Syne',sans-serif; font-size:0.58rem; color:var(--text-dim); }
+
+/* ACTIVITY FEED */
+.activity-item {
+  display:flex; gap:0.8rem; align-items:flex-start;
+  padding:0.8rem 0; border-bottom:1px solid var(--border);
+}
+.activity-item:last-child { border-bottom:none; }
+.act-dot {
+  width:8px; height:8px; border-radius:50%;
+  flex-shrink:0; margin-top:5px;
+}
+.act-dot.gold { background:var(--gold); }
+.act-dot.green { background:var(--success); }
+.act-dot.blue { background:var(--info); }
+.act-dot.red { background:var(--danger); }
+.act-text { font-size:0.82rem; color:var(--text); line-height:1.45; }
+.act-time { font-family:'Syne',sans-serif; font-size:0.65rem; color:var(--text-xs); margin-top:0.2rem; }
+
+/* SETTINGS */
+.settings-section { margin-bottom:2rem; }
+.settings-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1rem 1.2rem; border-bottom:1px solid var(--border);
+  flex-wrap:wrap; gap:1rem;
+}
+.settings-row:last-child { border-bottom:none; }
+.settings-label { font-size:0.88rem; color:var(--text); }
+.settings-hint { font-size:0.76rem; color:var(--text-dim); margin-top:0.2rem; }
+.toggle-switch { position:relative; width:44px; height:24px; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-track {
+  position:absolute; inset:0; background:var(--border-h);
+  border-radius:12px; cursor:pointer; transition:background 0.3s;
+}
+.toggle-track::before {
+  content:''; position:absolute; width:18px; height:18px; border-radius:50%;
+  left:3px; top:3px; background:#fff; transition:transform 0.3s;
+}
+.toggle-switch input:checked + .toggle-track { background:var(--gold); }
+.toggle-switch input:checked + .toggle-track::before { transform:translateX(20px); }
+
+/* MODAL */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.6); z-index:9000;
+  align-items:center; justify-content:center;
+}
+.modal-overlay.active { display:flex; }
+.modal-box {
+  background:var(--card); border:1px solid rgba(201,168,76,0.25);
+  border-radius:6px; padding:2rem;
+  width:90%; max-width:560px; max-height:86vh;
+  overflow-y:auto; animation:slideUp 0.3s ease;
+  box-shadow:var(--shadow-lg);
+}
+.modal-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);
+}
+.modal-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem; font-weight:500; color:var(--text);
+}
+.modal-x { background:none; border:none; color:var(--text-dim); font-size:1.2rem; cursor:pointer; transition:color 0.2s; }
+.modal-x:hover { color:var(--danger); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:1.5rem; left:50%;
+  transform:translateX(-50%) translateY(120px);
+  background:var(--card); border:1px solid rgba(201,168,76,0.35);
+  border-radius:4px; padding:0.75rem 1.5rem;
+  font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:600;
+  letter-spacing:0.08em; color:var(--gold);
+  z-index:99999; transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none; box-shadow:var(--shadow-lg);
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ANIMATIONS */
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .f-row{grid-template-columns:1fr;}
+}
+@media(max-width:540px){
+  .stats-row{grid-template-columns:1fr;}
+  .main{padding:1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ======= LOGIN ======= -->
+<div id="login-page">
+  <div class="login-bg"></div>
+  <div class="login-glow"></div>
+  <div class="login-card">
+    <div class="login-logo">MS Admin</div>
+    <div class="login-sub">Portfolio Dashboard · admin.domain.com</div>
+    <div class="login-divider"></div>
+    <div id="login-err" class="login-err">Incorrect credentials. Please try again.</div>
+    <label class="field-label">Username</label>
+    <input type="text" class="field-input" id="l-user" placeholder="admin" autocomplete="username">
+    <label class="field-label">Password</label>
+    <input type="password" class="field-input" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()">
+    <button class="btn-p" style="width:100%;justify-content:center;padding:0.75rem;" onclick="doLogin()">
+      Sign In to Dashboard
+    </button>
+    <p class="login-hint">Default credentials: admin / admin123</p>
+  </div>
+</div>
+
+<!-- ======= APP ======= -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">MS</div>
+      <span class="topbar-badge">Admin Panel</span>
+    </div>
+    <div class="topbar-right">
+      <div class="theme-pill">
+        <button class="tp-btn active" id="tp-dark" onclick="setTheme('dark')" title="Dark">🌙</button>
+        <button class="tp-btn" id="tp-light" onclick="setTheme('light')" title="Light">☀️</button>
+      </div>
+      <button class="topbar-btn" onclick="window.open('index.html','_blank')">↗ View Site</button>
+      <button class="topbar-btn danger" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">Main</div>
+      <div class="nav-item active" onclick="navTo('pg-overview',this)"><span class="ni-icon">📊</span>Overview</div>
+      <div class="sidebar-section">Content</div>
+      <div class="nav-item" onclick="navTo('pg-blog',this)"><span class="ni-icon">✍️</span>Blog Posts<span class="nav-badge" id="nb-blog">2</span></div>
+      <div class="nav-item" onclick="navTo('pg-testimonials',this)"><span class="ni-icon">💬</span>Testimonials</div>
+      <div class="nav-item" onclick="navTo('pg-downloads',this)"><span class="ni-icon">📁</span>Downloads</div>
+      <div class="sidebar-section">Communications</div>
+      <div class="nav-item" onclick="navTo('pg-contacts',this)"><span class="ni-icon">📨</span>Inquiries<span class="nav-badge" id="nb-contacts">3</span></div>
+      <div class="sidebar-section">System</div>
+      <div class="nav-item" onclick="navTo('pg-photo',this)"><span class="ni-icon">🖼️</span>Photo</div>
+      <div class="nav-item" onclick="navTo('pg-settings',this)"><span class="ni-icon">⚙️</span>Settings</div>
+      <div class="sidebar-user">
+        <div class="user-avatar">MS</div>
+        <div><div class="user-name">Muhammed Sabith</div><div class="user-role">Administrator</div></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- ===== OVERVIEW ===== -->
+      <div id="pg-overview" class="page active">
+        <div class="page-header">
+          <div class="page-title">Dashboard Overview</div>
+          <div class="page-sub">Welcome back, Sabith. Here's what's happening with your portfolio.</div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="sc-label">Total Page Views</div><div class="sc-num" id="sc-views">1,247</div><div class="sc-change">↑ 12% this week</div><div class="sc-icon">👁️</div></div>
+          <div class="stat-card"><div class="sc-label">CV Downloads</div><div class="sc-num" id="sc-dl">94</div><div class="sc-change">↑ 8 this week</div><div class="sc-icon">📄</div></div>
+          <div class="stat-card"><div class="sc-label">Contact Inquiries</div><div class="sc-num" id="sc-inq">3</div><div class="sc-change">2 unread</div><div class="sc-icon">📨</div></div>
+          <div class="stat-card"><div class="sc-label">Blog Posts</div><div class="sc-num" id="sc-posts">2</div><div class="sc-change">Both published</div><div class="sc-icon">✍️</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">Weekly Traffic</div>
+            <div class="chart-bars" id="traffic-chart"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:0.6rem;">
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Mon</span>
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Tue</span>
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Wed</span>
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Thu</span>
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Fri</span>
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Sat</span>
+              <span style="font-family:'Syne',sans-serif;font-size:0.62rem;color:var(--text-dim);">Sun</span>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Recent Activity</div>
+            <div id="activity-feed">
+              <div class="activity-item"><div class="act-dot green"></div><div><div class="act-text">New contact inquiry from Ahmad R.</div><div class="act-time">2 hours ago</div></div></div>
+              <div class="activity-item"><div class="act-dot gold"></div><div><div class="act-text">CV downloaded 3 times today</div><div class="act-time">5 hours ago</div></div></div>
+              <div class="activity-item"><div class="act-dot blue"></div><div><div class="act-text">Blog post "UAE Vision 2031" viewed 45 times</div><div class="act-time">Today</div></div></div>
+              <div class="activity-item"><div class="act-dot gold"></div><div><div class="act-text">New testimonial added by Sara M.</div><div class="act-time">Yesterday</div></div></div>
+              <div class="activity-item"><div class="act-dot red"></div><div><div class="act-text">Portfolio PDF downloaded</div><div class="act-time">2 days ago</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card" style="margin-top:1.5rem;">
+          <div class="table-header">
+            <div class="table-title">Recent Inquiries</div>
+            <button class="btn-s" onclick="navTo('pg-contacts',null)">View All</button>
+          </div>
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="ov-contacts-tbody">
+              <tr><td>Ahmad Rashid</td><td>ahmad@example.ae</td><td>Job Opportunity</td><td>Today</td><td><span class="badge badge-info">Unread</span></td></tr>
+              <tr><td>Fatima Al-Ali</td><td>fatima@company.com</td><td>Consulting</td><td>Yesterday</td><td><span class="badge badge-success">Read</span></td></tr>
+              <tr><td>Vijay Kumar</td><td>vijay@startup.io</td><td>Partnership</td><td>2 days ago</td><td><span class="badge badge-success">Read</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== BLOG POSTS ===== -->
+      <div id="pg-blog" class="page">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <div class="page-title">Blog Posts</div>
+            <div class="page-sub">Manage your thought leadership content.</div>
+          </div>
+          <button class="btn-p" onclick="openModal('m-blog')">+ New Post</button>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <div class="toolbar">
+              <input type="text" class="search-box" placeholder="Search posts…" oninput="filterBlog(this.value)">
+              <select class="select-box" onchange="filterBlogStatus(this.value)">
+                <option value="">All Status</option>
+                <option value="Published">Published</option>
+                <option value="Draft">Draft</option>
+              </select>
+            </div>
+            <div class="table-actions">
+              <button class="btn-s">Export</button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Views</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="blog-tbody">
+              <tr data-status="Published"><td>The Future of Digital Marketing in the UAE's Vision 2031 Economy</td><td>Digital Strategy</td><td>March 2025</td><td>312</td><td><span class="badge badge-success">Published</span></td><td><button class="act edit" onclick="showToast('Edit mode coming soon')">Edit</button> <button class="act del" onclick="deleteRow(this,'blog-tbody')">Delete</button></td></tr>
+              <tr data-status="Published"><td>Cultural Intelligence: Marketing to UAE's Diverse Multilingual Audience</td><td>Brand Building</td><td>Feb 2025</td><td>187</td><td><span class="badge badge-success">Published</span></td><td><button class="act edit" onclick="showToast('Edit mode coming soon')">Edit</button> <button class="act del" onclick="deleteRow(this,'blog-tbody')">Delete</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== TESTIMONIALS ===== -->
+      <div id="pg-testimonials" class="page">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <div class="page-title">Testimonials</div>
+            <div class="page-sub">Manage endorsements displayed on your portfolio.</div>
+          </div>
+          <button class="btn-p" onclick="openModal('m-testimonial')">+ Add</button>
+        </div>
+        <div class="table-card">
+          <div class="table-header"><div class="table-title">All Testimonials</div></div>
+          <table>
+            <thead><tr><th>Name</th><th>Role</th><th>Preview</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="test-tbody">
+              <tr><td>Ahmad Al-Khalidi</td><td>Director, Real Estate</td><td style="max-width:280px;font-size:0.8rem;color:var(--text-dim);">Sabith's ability to translate complex business goals…</td><td><span class="badge badge-success">Live</span></td><td><button class="act del" onclick="deleteRow(this,'test-tbody')">Remove</button></td></tr>
+              <tr><td>Sara Mohammed</td><td>Marketing Head, Healthcare</td><td style="max-width:280px;font-size:0.8rem;color:var(--text-dim);">Working with Sabith transformed our digital presence…</td><td><span class="badge badge-success">Live</span></td><td><button class="act del" onclick="deleteRow(this,'test-tbody')">Remove</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== DOWNLOADS ===== -->
+      <div id="pg-downloads" class="page">
+        <div class="page-header">
+          <div class="page-title">Downloads</div>
+          <div class="page-sub">Manage downloadable files on your portfolio.</div>
+        </div>
+        <div class="grid-3">
+          <div class="panel" style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div style="font-size:1.8rem;">📄</div>
+            <div style="font-weight:600;font-size:0.9rem;">Curriculum Vitae</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">sabith_cv.pdf · Main resume</div>
+            <div style="display:flex;gap:0.5rem;margin-top:auto;">
+              <button class="btn-s" style="flex:1;" onclick="document.getElementById('upload-cv').click()">Replace</button>
+              <input type="file" id="upload-cv" accept=".pdf" style="display:none;" onchange="showToast('CV updated — place file as sabith_cv.pdf')">
+              <span class="badge badge-success" style="align-self:center;">Active</span>
+            </div>
+          </div>
+          <div class="panel" style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div style="font-size:1.8rem;">🎯</div>
+            <div style="font-weight:600;font-size:0.9rem;">Marketing Director CV</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">sabith_marketing_cv.pdf · ATS optimized</div>
+            <div style="display:flex;gap:0.5rem;margin-top:auto;">
+              <button class="btn-s" style="flex:1;" onclick="showToast('Place file as sabith_marketing_cv.pdf in folder')">Replace</button>
+              <span class="badge badge-success" style="align-self:center;">Active</span>
+            </div>
+          </div>
+          <div class="panel" style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div style="font-size:1.8rem;">📚</div>
+            <div style="font-weight:600;font-size:0.9rem;">MBA Research Paper</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">mba_research.pdf · Academic paper</div>
+            <div style="display:flex;gap:0.5rem;margin-top:auto;">
+              <button class="btn-s" style="flex:1;" onclick="showToast('Place file as mba_research.pdf in folder')">Replace</button>
+              <span class="badge badge-draft" style="align-self:center;">Pending</span>
+            </div>
+          </div>
+          <div class="panel" style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div style="font-size:1.8rem;">🗂️</div>
+            <div style="font-weight:600;font-size:0.9rem;">Marketing Portfolio</div>
+            <div style="font-size:0.78rem;color:var(--text-dim);">portfolio.pdf · Case studies</div>
+            <div style="display:flex;gap:0.5rem;margin-top:auto;">
+              <button class="btn-s" style="flex:1;" onclick="showToast('Place file as portfolio.pdf in folder')">Replace</button>
+              <span class="badge badge-draft" style="align-self:center;">Pending</span>
+            </div>
+          </div>
+          <div class="panel" style="border:1px dashed rgba(201,168,76,0.28);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;min-height:160px;cursor:pointer;" onclick="openModal('m-download')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <div style="font-family:'Syne',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);opacity:0.7;">Add Download</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CONTACTS ===== -->
+      <div id="pg-contacts" class="page">
+        <div class="page-header">
+          <div class="page-title">Contact Inquiries</div>
+          <div class="page-sub">Messages submitted through your portfolio contact form.</div>
+        </div>
+        <div class="table-card">
+          <div class="table-header">
+            <div class="toolbar">
+              <input type="text" class="search-box" placeholder="Search inquiries…">
+              <select class="select-box">
+                <option>All</option><option>Unread</option><option>Read</option>
+              </select>
+            </div>
+            <button class="btn-s" onclick="showToast('Exported to CSV')">Export CSV</button>
+          </div>
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="contacts-tbody">
+              <tr><td>Ahmad Rashid</td><td>ahmad@example.ae</td><td>+971 50 123 4567</td><td>Job Opportunity</td><td>Today</td><td><span class="badge badge-info">Unread</span></td><td><button class="act view" onclick="showToast('Message: Looking for a Marketing Director…')">View</button> <button class="act del" onclick="deleteRow(this,'contacts-tbody')">Delete</button></td></tr>
+              <tr><td>Fatima Al-Ali</td><td>fatima@company.com</td><td>+971 55 987 6543</td><td>Consulting</td><td>Yesterday</td><td><span class="badge badge-success">Read</span></td><td><button class="act view" onclick="showToast('Message: We need consulting on our brand…')">View</button> <button class="act del" onclick="deleteRow(this,'contacts-tbody')">Delete</button></td></tr>
+              <tr><td>Vijay Kumar</td><td>vijay@startup.io</td><td>—</td><td>Partnership</td><td>2 days ago</td><td><span class="badge badge-success">Read</span></td><td><button class="act view" onclick="showToast('Message: Would love to explore a collaboration…')">View</button> <button class="act del" onclick="deleteRow(this,'contacts-tbody')">Delete</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== PHOTO ===== -->
+      <div id="pg-photo" class="page">
+        <div class="page-header">
+          <div class="page-title">Profile Photo</div>
+          <div class="page-sub">Update your background-removed PNG profile photo.</div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">Current Photo</div>
+            <div style="width:200px;height:200px;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:var(--card-2);border:2px solid rgba(201,168,76,0.25);overflow:hidden;margin:0 auto 1.5rem;">
+              <img id="admin-photo-preview" src="photo.png" alt="Profile" style="width:100%;height:100%;object-fit:cover;object-position:top;"
+                   onerror="this.src='';this.style.display='none';document.getElementById('photo-noimg').style.display='flex';">
+              <div id="photo-noimg" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;flex-direction:column;gap:0.4rem;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1" opacity="0.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <button class="btn-p" onclick="document.getElementById('photo-file').click()">Upload New Photo</button>
+              <input type="file" id="photo-file" accept="image/png,image/jpg,image/jpeg,image/webp" style="display:none;" onchange="previewAdminPhoto(this)">
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Instructions</div>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+              <div class="activity-item" style="border:none;padding:0.5rem 0;">
+                <div class="act-dot gold"></div>
+                <div><div class="act-text">Use a PNG with background removed for best results</div></div>
+              </div>
+              <div class="activity-item" style="border:none;padding:0.5rem 0;">
+                <div class="act-dot gold"></div>
+                <div><div class="act-text">Name the file exactly <strong>photo.png</strong></div></div>
+              </div>
+              <div class="activity-item" style="border:none;padding:0.5rem 0;">
+                <div class="act-dot gold"></div>
+                <div><div class="act-text">Place it in the same folder as index.html and admin.html</div></div>
+              </div>
+              <div class="activity-item" style="border:none;padding:0.5rem 0;">
+                <div class="act-dot gold"></div>
+                <div><div class="act-text">Recommended: minimum 400×400px, square crop, face centred</div></div>
+              </div>
+              <div class="activity-item" style="border:none;padding:0.5rem 0;">
+                <div class="act-dot blue"></div>
+                <div><div class="act-text">Use tools like remove.bg or Canva to remove the background</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div id="pg-settings" class="page">
+        <div class="page-header">
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Configure your portfolio and admin preferences.</div>
+        </div>
+
+        <div class="settings-section">
+          <div class="panel" style="padding:0;">
+            <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">Profile Details</div>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Full Name</div><div class="settings-hint">Displayed across the portfolio</div></div>
+              <input type="text" class="f-input" value="Muhammed Sabith" style="max-width:260px;">
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Email Address</div><div class="settings-hint">Used in contact section</div></div>
+              <input type="email" class="f-input" value="sabith@example.com" style="max-width:260px;">
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Phone / WhatsApp</div><div class="settings-hint">Shown in contact section</div></div>
+              <input type="tel" class="f-input" value="+971 50 000 0000" style="max-width:260px;">
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">LinkedIn URL</div></div>
+              <input type="url" class="f-input" value="https://linkedin.com/in/" style="max-width:260px;">
+            </div>
+            <div class="settings-row" style="border:none;padding-top:1rem;">
+              <div></div>
+              <button class="btn-p" onclick="showToast('Settings saved!')">Save Changes</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="panel" style="padding:0;">
+            <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">Admin Security</div>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Admin Username</div></div>
+              <input type="text" class="f-input" value="admin" style="max-width:260px;">
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Current Password</div></div>
+              <input type="password" class="f-input" placeholder="Current password" style="max-width:260px;">
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">New Password</div></div>
+              <input type="password" class="f-input" placeholder="New password" style="max-width:260px;">
+            </div>
+            <div class="settings-row" style="border:none;padding-top:1rem;">
+              <div></div>
+              <button class="btn-p" onclick="showToast('Password updated!')">Update Password</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="panel" style="padding:0;">
+            <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">Preferences</div>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Email notifications on new inquiries</div><div class="settings-hint">Get notified when someone submits the contact form</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div></label>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Show "Available to Work" badge</div><div class="settings-hint">Displays the availability indicator on your hero photo</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div></label>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Particle animation on portfolio</div><div class="settings-hint">Floating gold particles in the background</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><div class="toggle-track"></div></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ======= MODALS ======= -->
+
+<!-- Blog Modal -->
+<div class="modal-overlay" id="m-blog">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">New Blog Post</div>
+      <button class="modal-x" onclick="closeModal('m-blog')">✕</button>
+    </div>
+    <div class="f-group"><label class="f-label">Title *</label><input type="text" class="f-input" id="mb-title" placeholder="Post title"></div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Category</label><input type="text" class="f-input" id="mb-cat" placeholder="e.g. Digital Strategy"></div>
+      <div class="f-group"><label class="f-label">Date</label><input type="text" class="f-input" id="mb-date" placeholder="e.g. April 2025"></div>
+    </div>
+    <div class="f-group"><label class="f-label">Excerpt *</label><textarea class="f-input" id="mb-excerpt" style="min-height:90px;resize:vertical;" placeholder="Short description of the post…"></textarea></div>
+    <div class="f-group"><label class="f-label">Link (optional)</label><input type="url" class="f-input" id="mb-link" placeholder="https://…"></div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Status</label><select class="f-input" id="mb-status"><option>Published</option><option>Draft</option></select></div>
+    </div>
+    <div style="display:flex;gap:0.8rem;margin-top:0.5rem;">
+      <button class="btn-p" onclick="saveBlogPost()" style="flex:1;justify-content:center;">Publish Post</button>
+      <button class="btn-s" onclick="closeModal('m-blog')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Testimonial Modal -->
+<div class="modal-overlay" id="m-testimonial">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Add Testimonial</div>
+      <button class="modal-x" onclick="closeModal('m-testimonial')">✕</button>
+    </div>
+    <div class="f-group"><label class="f-label">Testimonial Text *</label><textarea class="f-input" id="mt-text" style="min-height:100px;resize:vertical;" placeholder="Write the testimonial here…"></textarea></div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Name *</label><input type="text" class="f-input" id="mt-name" placeholder="Person's full name"></div>
+      <div class="f-group"><label class="f-label">Role / Title</label><input type="text" class="f-input" id="mt-role" placeholder="Job title, company"></div>
+    </div>
+    <div style="display:flex;gap:0.8rem;margin-top:0.5rem;">
+      <button class="btn-p" onclick="saveTestimonial()" style="flex:1;justify-content:center;">Add Testimonial</button>
+      <button class="btn-s" onclick="closeModal('m-testimonial')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Download Modal -->
+<div class="modal-overlay" id="m-download">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Add Download File</div>
+      <button class="modal-x" onclick="closeModal('m-download')">✕</button>
+    </div>
+    <div class="f-group"><label class="f-label">File Title *</label><input type="text" class="f-input" placeholder="e.g. Research Paper 2025"></div>
+    <div class="f-group"><label class="f-label">Description</label><input type="text" class="f-input" placeholder="Brief description"></div>
+    <div class="f-group"><label class="f-label">Filename *</label><input type="text" class="f-input" placeholder="e.g. research_2025.pdf"></div>
+    <div class="f-group"><label class="f-label">Emoji Icon</label><input type="text" class="f-input" placeholder="e.g. 📄"></div>
+    <div style="display:flex;gap:0.8rem;margin-top:0.5rem;">
+      <button class="btn-p" onclick="showToast('Download added — place PDF in project folder');closeModal('m-download');" style="flex:1;justify-content:center;">Add File</button>
+      <button class="btn-s" onclick="closeModal('m-download')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== LOGIN =====
+const CREDS = { user:'admin', pass:'admin123' };
+function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const err = document.getElementById('login-err');
+  if(u===CREDS.user && p===CREDS.pass) {
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('app').classList.add('active');
+    initCharts(); initTheme();
+  } else {
+    err.style.display='block';
+    document.getElementById('l-pass').value='';
+    setTimeout(()=>err.style.display='none',3500);
+  }
+}
+function doLogout() {
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('l-user').value='';
+  document.getElementById('l-pass').value='';
+}
+document.getElementById('l-pass').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
+
+// ===== THEME =====
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('ms-admin-theme',t);
+  document.getElementById('tp-dark').classList.toggle('active',t==='dark');
+  document.getElementById('tp-light').classList.toggle('active',t==='light');
+}
+function initTheme() {
+  const saved = localStorage.getItem('ms-admin-theme')||'dark';
+  setTheme(saved);
+}
+initTheme();
+
+// ===== NAVIGATION =====
+function navTo(pageId, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if(btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes(pageId)) n.classList.add('active');
+    });
+  }
+}
+
+// ===== CHARTS =====
+function initCharts() {
+  const data=[45,78,55,92,67,40,60];
+  const max=Math.max(...data);
+  const chart=document.getElementById('traffic-chart');
+  chart.innerHTML='';
+  data.forEach(v=>{
+    const col=document.createElement('div');
+    col.className='bar-col';
+    const fill=document.createElement('div');
+    fill.className='bar-fill';
+    fill.style.height='0px';
+    col.appendChild(fill);
+    chart.appendChild(col);
+    setTimeout(()=>{ fill.style.height=(v/max*90)+'px'; },100);
+  });
+}
+
+// ===== MODALS =====
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active');}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.active').forEach(m=>m.classList.remove('active'));});
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ===== SAVE BLOG =====
+function saveBlogPost() {
+  const title=document.getElementById('mb-title').value.trim();
+  const excerpt=document.getElementById('mb-excerpt').value.trim();
+  if(!title||!excerpt){showToast('Please fill title and excerpt.');return;}
+  const cat=document.getElementById('mb-cat').value.trim()||'General';
+  const date=document.getElementById('mb-date').value.trim()||'Recent';
+  const status=document.getElementById('mb-status').value;
+  const tbody=document.getElementById('blog-tbody');
+  const row=document.createElement('tr');
+  row.setAttribute('data-status',status);
+  row.innerHTML=`<td>${title}</td><td>${cat}</td><td>${date}</td><td>0</td><td><span class="badge ${status==='Published'?'badge-success':'badge-draft'}">${status}</span></td><td><button class="act edit" onclick="showToast('Edit coming soon')">Edit</button> <button class="act del" onclick="deleteRow(this,'blog-tbody')">Delete</button></td>`;
+  tbody.prepend(row);
+  const cnt=parseInt(document.getElementById('sc-posts').textContent)+1;
+  document.getElementById('sc-posts').textContent=cnt;
+  document.getElementById('nb-blog').textContent=cnt;
+  closeModal('m-blog');
+  showToast('✓ Post published!');
+  ['mb-title','mb-excerpt','mb-cat','mb-date','mb-link'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ===== SAVE TESTIMONIAL =====
+function saveTestimonial() {
+  const text=document.getElementById('mt-text').value.trim();
+  const name=document.getElementById('mt-name').value.trim();
+  const role=document.getElementById('mt-role').value.trim();
+  if(!text||!name){showToast('Please fill name and text.');return;}
+  const tbody=document.getElementById('test-tbody');
+  const row=document.createElement('tr');
+  row.innerHTML=`<td>${name}</td><td>${role||'—'}</td><td style="max-width:280px;font-size:0.8rem;color:var(--text-dim);">${text.slice(0,60)}…</td><td><span class="badge badge-success">Live</span></td><td><button class="act del" onclick="deleteRow(this,'test-tbody')">Remove</button></td>`;
+  tbody.prepend(row);
+  closeModal('m-testimonial');
+  showToast('✓ Testimonial added!');
+  ['mt-text','mt-name','mt-role'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ===== DELETE ROW =====
+function deleteRow(btn, tbodyId) {
+  if(!confirm('Remove this entry?')) return;
+  btn.closest('tr').remove();
+  showToast('Entry removed.');
+}
+
+// ===== FILTER BLOG =====
+function filterBlog(q) {
+  document.querySelectorAll('#blog-tbody tr').forEach(row=>{
+    row.style.display=row.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+  });
+}
+function filterBlogStatus(status) {
+  document.querySelectorAll('#blog-tbody tr').forEach(row=>{
+    row.style.display=(!status||row.dataset.status===status)?'':'none';
+  });
+}
+
+// ===== PHOTO =====
+function previewAdminPhoto(input) {
+  if(input.files&&input.files[0]) {
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=document.getElementById('admin-photo-preview');
+      img.src=e.target.result; img.style.display='block';
+      document.getElementById('photo-noimg').style.display='none';
+      showToast('Photo previewed — save as photo.png in project folder');
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+</script>
+</body>
+</html>
